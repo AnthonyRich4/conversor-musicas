@@ -5,14 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conversor de Músicas</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script>
+        function showEffect(effect) {
+            // Ocultar todas as opções de efeito
+            document.getElementById('8d').style.display = 'none';
+            document.getElementById('slowed').style.display = 'none';
+
+            // Mostrar a opção selecionada
+            document.getElementById(effect).style.display = 'block';
+        }
+
+        // Mostrar a opção "8D" por padrão
+        window.onload = () => {
+            showEffect('8d');
+        };
+    </script>
 </head>
 <body>
     <div class="container">
         <h1>Conversor de Músicas</h1>
-        <form action="/upload" method="POST" enctype="multipart/form-data">
-            <input type="file" name="audioFile" accept="audio/*" required>
-            <button type="submit">Enviar Música</button>
-        </form>
+        <div class="tabs">
+            <button onclick="showEffect('8d')">8D</button>
+            <button onclick="showEffect('slowed')">Slowed + Reverb</button>
+        </div>
+        <div class="effect-options">
+            <form id="8d" class="effect-option" action="/upload" method="POST" enctype="multipart/form-data" style="display: none;">
+                <input type="file" name="audioFile" accept="audio/*" required>
+                <input type="hidden" name="effect" value="8d">
+                <button type="submit">Enviar Música (8D)</button>
+            </form>
+            <form id="slowed" class="effect-option" action="/upload" method="POST" enctype="multipart/form-data" style="display: none;">
+                <input type="file" name="audioFile" accept="audio/*" required>
+                <input type="hidden" name="effect" value="slowed">
+                <button type="submit">Enviar Música (Slowed + Reverb)</button>
+            </form>
+        </div>
         <p>Aguarde enquanto a conversão é realizada...</p>
     </div>
 </body>

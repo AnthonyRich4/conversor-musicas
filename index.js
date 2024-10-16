@@ -8,7 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Configurar o caminho do ffmpeg, caso necessário
-// Remova ou ajuste se o ffmpeg já estiver no PATH e funcionando
+// Ajuste se o ffmpeg já estiver no PATH e funcionando
 ffmpeg.setFfmpegPath(path.join('C:', 'ffmpeg', 'bin', 'ffmpeg.exe'));
 ffmpeg.setFfprobePath(path.join('C:', 'ffmpeg', 'bin', 'ffprobe.exe'));
 
@@ -34,23 +34,52 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
-// Rota para processar o upload e aplicar o efeito 8D
+// Rota para processar o upload e aplicar o efeito selecionado
 app.post('/upload', upload.single('audioFile'), (req, res) => {
   const inputPath = path.join(__dirname, req.file.path);
   const outputPath = path.join(__dirname, 'public/audio', 'converted-' + req.file.filename);
+  const selectedEffect = req.body.effect;
 
-  // Usar ffmpeg para aplicar um efeito de "8D"
-  ffmpeg(inputPath)
-    .audioFilters([
-      {
-        filter: 'apulsator',
-        options: 'hz=0.1' // Controla a velocidade do movimento (0.1 Hz é um movimento suave)
-      },
-      {
-        filter: 'pan',
-        options: 'stereo|c0=1.0*c0|c1=1.0*c1' // Mantém o áudio em estéreo
-      }
-    ])
+  let ffmpegCommand = ffmpeg(inputPath);
+
+  // Verificar qual efeito foi selecionado e aplicar o correspondente
+  if (selectedEffect === '8d') {
+    // Aplicar o efeito 8D
+    ffmpegCommand = ffmpegCommand
+      .audioFilters([
+        {
+          filter: 'apulsator',
+          options: 'hz=0.1' // Controla a velocidade do movimento (0.1 Hz é um movimento suave)
+        },
+        {
+          filter: 'pan',
+          options: 'stereo|c0=1.0*c0|c1=1.0*c1' // Mantém o áudio em estéreo
+        }
+      ])
+      .audioBitrate('320k')
+      .audioCodec('libmp3lame')
+      .audioFrequency(48000);
+
+  } else if (selectedEffect === 'slowed') {
+    // Aplicar o efeito Slowed + Reverb
+    ffmpegCommand = ffmpegCommand
+      .audioFilters([
+        {
+          filter: 'atempo',
+          options: '0.8' // Reduz a velocidade para 80% (efeito slowed)
+        },
+        {
+          filter: 'aecho',
+          options: '0.8:0.88:60:0.4' // Adiciona um efeito de reverb
+        }
+      ])
+      .audioBitrate('320k')
+      .audioCodec('libmp3lame')
+      .audioFrequency(48000);
+  }
+
+  // Salvar o arquivo processado
+  ffmpegCommand
     .save(outputPath)
     .on('end', () => {
       // Excluir o arquivo de entrada após a conversão para economizar espaço

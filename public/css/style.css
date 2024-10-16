@@ -1,4 +1,3 @@
-/* Estilo global */
 body {
     font-family: 'Roboto', sans-serif;
     background: linear-gradient(135deg, #f0f0f5, #d6d8e7);
@@ -12,7 +11,6 @@ body {
     color: #333;
 }
 
-/* Estilo do contêiner */
 .container {
     background: rgba(255, 255, 255, 0.9);
     padding: 30px;
@@ -24,9 +22,38 @@ body {
     transition: all 0.3s ease-in-out;
 }
 
-.container:hover {
-    transform: translateY(-5px);
-    box-shadow: 0px 12px 32px rgba(0, 0, 0, 0.2);
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.tabs button {
+    background: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.tabs button:hover {
+    background: #0056b3;
+}
+
+.effect-options {
+    position: relative;
+}
+
+.effect-option {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.effect-option[style*="display: block"] {
+    opacity: 1;
 }
 
 h1 {
@@ -36,7 +63,6 @@ h1 {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilo do input */
 input[type="file"] {
     display: block;
     margin: 20px auto;
@@ -53,8 +79,7 @@ input[type="file"]:hover {
     border-color: #007BFF;
 }
 
-/* Estilo do botão */
-button {
+button[type="submit"] {
     background: linear-gradient(135deg, #007BFF, #0056b3);
     color: #ffffff;
     border: none;
@@ -66,18 +91,17 @@ button {
     box-shadow: 0px 4px 10px rgba(0, 123, 255, 0.3);
 }
 
-button:hover {
+button[type="submit"]:hover {
     background: linear-gradient(135deg, #0056b3, #007BFF);
     transform: translateY(-2px);
     box-shadow: 0px 6px 14px rgba(0, 123, 255, 0.5);
 }
 
-button:active {
+button[type="submit"]:active {
     transform: translateY(1px);
     box-shadow: 0px 2px 6px rgba(0, 123, 255, 0.3);
 }
 
-/* Estilo do texto de aviso */
 p {
     margin-top: 15px;
     color: #666;

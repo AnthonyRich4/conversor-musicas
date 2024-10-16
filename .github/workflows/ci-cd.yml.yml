@@ -1,0 +1,12 @@
+name: Build with Self-Hosted Runner
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run build script
+        run: echo "Hello, World!"

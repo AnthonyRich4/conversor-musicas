@@ -3,23 +3,16 @@ const path = require('path');
 const multer = require('multer');
 const ffmpeg = require('fluent-ffmpeg');
 const fs = require('fs');
+const { exec } = require('youtube-dl-exec');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configurar o caminho do ffmpeg, caso necessário
-// Ajuste se o ffmpeg já estiver no PATH e funcionando
-ffmpeg.setFfmpegPath(path.join('C:', 'ffmpeg', 'bin', 'ffmpeg.exe'));
-ffmpeg.setFfprobePath(path.join('C:', 'ffmpeg', 'bin', 'ffprobe.exe'));
-
-// Configurar EJS e pasta de views
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-// Configurar a pasta 'public' para arquivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: true }));
 
-// Configurar o upload de arquivos
 const storage = multer.diskStorage({
   destination: 'public/audio',
   filename: (req, file, cb) => {
@@ -29,78 +22,77 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Rota principal para renderizar a página de upload
 app.get('/', (req, res) => {
-  res.render('index');
+  res.render('index', { downloadLink: null, errorMessage: null });
 });
 
-// Rota para processar o upload e aplicar o efeito selecionado
-app.post('/upload', upload.single('audioFile'), (req, res) => {
-  const inputPath = path.join(__dirname, req.file.path);
-  const outputPath = path.join(__dirname, 'public/audio', 'converted-' + req.file.filename);
-  const selectedEffect = req.body.effect;
+app.post('/convert', upload.single('audioFile'), async (req, res) => {
+  const youtubeURL = req.body.youtubeURL;
+  let outputPath;
 
-  let ffmpegCommand = ffmpeg(inputPath);
+  try {
+    if (youtubeURL) {
+      const outputDir = path.join(__dirname, 'public/audio');
+      const tempFilePath = path.join(outputDir, `${Date.now()}-temp.mp3`);
 
-  // Verificar qual efeito foi selecionado e aplicar o correspondente
-  if (selectedEffect === '8d') {
-    // Aplicar o efeito 8D
-    ffmpegCommand = ffmpegCommand
-      .audioFilters([
-        {
-          filter: 'apulsator',
-          options: 'hz=0.1' // Controla a velocidade do movimento (0.1 Hz é um movimento suave)
-        },
-        {
-          filter: 'pan',
-          options: 'stereo|c0=1.0*c0|c1=1.0*c1' // Mantém o áudio em estéreo
-        }
-      ])
-      .audioBitrate('320k')
-      .audioCodec('libmp3lame')
-      .audioFrequency(48000);
-
-  } else if (selectedEffect === 'slowed') {
-    // Aplicar o efeito Slowed + Reverb
-    ffmpegCommand = ffmpegCommand
-      .audioFilters([
-        {
-          filter: 'atempo',
-          options: '0.8' // Reduz a velocidade para 80% (efeito slowed)
-        },
-        {
-          filter: 'aecho',
-          options: '0.8:0.88:60:0.4' // Adiciona um efeito de reverb
-        }
-      ])
-      .audioBitrate('320k')
-      .audioCodec('libmp3lame')
-      .audioFrequency(48000);
-  }
-
-  // Salvar o arquivo processado
-  ffmpegCommand
-    .save(outputPath)
-    .on('end', () => {
-      // Excluir o arquivo de entrada após a conversão para economizar espaço
-      fs.unlinkSync(inputPath);
-      // Oferecer o download do arquivo convertido
-      res.download(outputPath, (err) => {
-        if (err) {
-          console.error('Erro ao baixar o arquivo:', err);
-        } else {
-          // Excluir o arquivo convertido após o download
-          fs.unlinkSync(outputPath);
-        }
+      // Baixa o áudio do YouTube usando youtube-dl-exec
+      await exec(youtubeURL, {
+        output: tempFilePath,
+        extractAudio: true,
+        audioFormat: 'mp3',
+        ffmpegLocation: path.join('C:', 'ffmpeg', 'bin', 'ffmpeg.exe'), // Ajuste o caminho do ffmpeg conforme necessário
       });
-    })
-    .on('error', (err) => {
-      console.error('Erro ao converter o arquivo:', err);
-      res.status(500).send('Erro ao converter o arquivo.');
-    });
+
+      console.log('Download do áudio concluído.');
+
+      // Aplica o efeito usando ffmpeg
+      const finalOutputPath = path.join(outputDir, `converted-${Date.now()}.mp3`);
+      ffmpeg(tempFilePath)
+        .audioFilters([
+          { filter: 'apulsator', options: 'hz=0.1' },
+          { filter: 'pan', options: 'stereo|c0=1.0*c0|c1=1.0*c1' },
+        ])
+        .audioBitrate('320k')
+        .audioCodec('libmp3lame')
+        .save(finalOutputPath)
+        .on('end', () => {
+          fs.unlinkSync(tempFilePath);
+          res.render('index', { downloadLink: `/audio/${path.basename(finalOutputPath)}`, errorMessage: null });
+        })
+        .on('error', (err) => {
+          console.error('Erro ao aplicar efeito no áudio:', err);
+          res.render('index', { downloadLink: null, errorMessage: 'Erro ao processar o áudio. Tente novamente.' });
+        });
+
+    } else if (req.file) {
+      const inputPath = path.join(__dirname, req.file.path);
+      outputPath = path.join(__dirname, 'public/audio', `converted-${req.file.filename}`);
+
+      ffmpeg(inputPath)
+        .audioFilters([
+          { filter: 'apulsator', options: 'hz=0.1' },
+          { filter: 'pan', options: 'stereo|c0=1.0*c0|c1=1.0*c1' }
+        ])
+        .audioBitrate('320k')
+        .audioCodec('libmp3lame')
+        .save(outputPath)
+        .on('end', () => {
+          fs.unlinkSync(inputPath);
+          res.render('index', { downloadLink: `/audio/converted-${req.file.filename}`, errorMessage: null });
+        })
+        .on('error', (err) => {
+          console.error('Erro ao converter o arquivo:', err);
+          res.render('index', { downloadLink: null, errorMessage: 'Erro ao processar o arquivo. Tente novamente.' });
+        });
+    } else {
+      res.render('index', { downloadLink: null, errorMessage: 'Por favor, insira um link do YouTube válido ou envie um arquivo.' });
+    }
+  } catch (error) {
+    console.error('Erro durante a conversão:', error);
+    res.render('index', { downloadLink: null, errorMessage: 'Ocorreu um erro durante o processamento. Tente novamente.' });
+  }
 });
 
-// Iniciar o servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });

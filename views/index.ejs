@@ -3,44 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor de Músicas</title>
+    <title>Conversor de Músicas - Efeitos 8D e Slowed + Reverb</title>
     <link rel="stylesheet" href="/css/style.css">
-    <script>
-        function showEffect(effect) {
-            // Ocultar todas as opções de efeito
-            document.getElementById('8d').style.display = 'none';
-            document.getElementById('slowed').style.display = 'none';
-
-            // Mostrar a opção selecionada
-            document.getElementById(effect).style.display = 'block';
-        }
-
-        // Mostrar a opção "8D" por padrão
-        window.onload = () => {
-            showEffect('8d');
-        };
-    </script>
 </head>
 <body>
     <div class="container">
         <h1>Conversor de Músicas</h1>
+        <p>Transforme suas músicas em experiências únicas com nossos efeitos especiais!</p>
+        
+        <!-- Exibição de mensagens de erro, caso existam -->
+        <% if (errorMessage) { %>
+            <div class="error">
+                <p><%= errorMessage %></p>
+            </div>
+        <% } %>
+
+        <!-- Seletor de abas -->
         <div class="tabs">
-            <button onclick="showEffect('8d')">8D</button>
-            <button onclick="showEffect('slowed')">Slowed + Reverb</button>
+            <button class="tab-btn active" onclick="showTab('8d')">Efeito 8D</button>
+            <button class="tab-btn" onclick="showTab('slowed')">Slowed + Reverb</button>
         </div>
-        <div class="effect-options">
-            <form id="8d" class="effect-option" action="/upload" method="POST" enctype="multipart/form-data" style="display: none;">
-                <input type="file" name="audioFile" accept="audio/*" required>
+
+        <!-- Formulário para Efeito 8D -->
+        <div id="8d" class="tab-content active">
+            <form class="form" action="/convert" method="POST" enctype="multipart/form-data" onsubmit="showLoadingMessage()">
+                <input type="text" name="youtubeURL" class="input" placeholder="Insira o link do YouTube (opcional)">
+                <p class="separator">OU</p>
+                <input type="file" name="audioFile" class="input" accept="audio/*">
                 <input type="hidden" name="effect" value="8d">
-                <button type="submit">Enviar Música (8D)</button>
-            </form>
-            <form id="slowed" class="effect-option" action="/upload" method="POST" enctype="multipart/form-data" style="display: none;">
-                <input type="file" name="audioFile" accept="audio/*" required>
-                <input type="hidden" name="effect" value="slowed">
-                <button type="submit">Enviar Música (Slowed + Reverb)</button>
+                <button type="submit" class="btn">Converter</button>
             </form>
         </div>
-        <p>Aguarde enquanto a conversão é realizada...</p>
+
+        <!-- Formulário para Efeito Slowed + Reverb -->
+        <div id="slowed" class="tab-content">
+            <form class="form" action="/upload" method="POST" enctype="multipart/form-data" onsubmit="showLoadingMessage()">
+                <input type="file" name="audioFile" class="input" accept="audio/*" required>
+                <input type="hidden" name="effect" value="slowed">
+                <button type="submit" class="btn">Converter para Slowed + Reverb</button>
+            </form>
+        </div>
+
+        <!-- Mensagem de carregamento -->
+        <p id="loadingMessage" class="loading" style="display: none;">Aguarde enquanto a conversão é realizada...</p>
+
+        <!-- Link para download do arquivo convertido -->
+        <% if (downloadLink) { %>
+            <div class="download">
+                <p>Sua música foi convertida! <a href="<%= downloadLink %>" class="download-link" download>Clique aqui para baixar</a>.</p>
+            </div>
+        <% } %>
     </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
+        }
+
+        function showLoadingMessage() {
+            document.getElementById('loadingMessage').style.display = 'block';
+        }
+    </script>
 </body>
 </html>

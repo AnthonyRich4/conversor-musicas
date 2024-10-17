@@ -1,52 +1,62 @@
+/* ----------- Reset e Base ----------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-smoothing: antialiased;
+    transition: all 0.3s ease-in-out;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     background: linear-gradient(135deg, #3A0D7E, #282C34, #5E0E86, #1C1C1C);
-    background-size: 300% 300%;
+    background-size: 400% 400%;
     animation: gradientAnimation 20s ease infinite;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
-    color: #333;
+    color: #e6e6ff;
+    overflow: hidden;
+    perspective: 1000px;
 }
 
 @keyframes gradientAnimation {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
+/* ----------- Container ----------- */
 .container {
     background: rgba(50, 50, 60, 0.95);
-    padding: 30px;
+    padding: 40px;
     border-radius: 16px;
     box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2);
     text-align: center;
     max-width: 500px;
     width: 100%;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* ----------- Títulos e Textos ----------- */
 h1 {
-    font-size: 2.5em;
-    margin-bottom: 10px;
+    font-size: 2.4em;
+    margin-bottom: 15px;
     color: #D1A4FF;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-    animation: fadeInDown 0.8s ease-in-out;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 p {
-    color: #BBB;
+    color: #AAA;
     font-size: 1.1em;
-    margin-bottom: 15px;
-    animation: fadeIn 1s ease-in-out;
+    margin-bottom: 20px;
 }
 
 .separator {
@@ -55,51 +65,57 @@ p {
     margin: 10px 0;
 }
 
+/* ----------- Tabs e Botões ----------- */
 .tabs {
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    gap: 10px;
+    margin-bottom: 25px;
 }
 
 .tab-btn {
     background: linear-gradient(135deg, #7D3AC1, #B350E2);
     color: white;
     border: none;
-    padding: 12px 20px;
-    border-radius: 16px;
+    padding: 10px 18px;
+    border-radius: 12px;
     margin: 0 5px;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 12px rgba(125, 58, 193, 0.2);
+    transition: background 0.3s ease, transform 0.3s ease;
+    box-shadow: 0px 4px 12px rgba(125, 58, 193, 0.4);
 }
 
 .tab-btn.active {
     background: linear-gradient(135deg, #5E0E86, #8F52E7);
     transform: translateY(-2px);
-    box-shadow: 0 6px 14px rgba(125, 58, 193, 0.5);
+    box-shadow: 0px 6px 18px rgba(125, 58, 193, 0.5);
 }
 
+.tab-btn:hover {
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, #6E2EA1, #9A4DD2);
+}
+
+/* ----------- Inputs e Botões de Ação ----------- */
 .form {
     margin-bottom: 20px;
-    animation: fadeInUp 0.8s ease-in-out;
 }
 
 .input {
     width: 100%;
     padding: 12px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     border: 2px solid #555;
     border-radius: 12px;
-    transition: border-color 0.3s ease;
-    font-size: 1em;
     background: #2E2E2E;
     color: #EEE;
+    transition: border-color 0.3s ease;
 }
 
 .input:focus {
     border-color: #B350E2;
+    box-shadow: 0 0 10px rgba(125, 58, 193, 0.5);
     outline: none;
-    box-shadow: 0 0 8px rgba(125, 58, 193, 0.3);
 }
 
 .btn {
@@ -107,34 +123,29 @@ p {
     color: #ffffff;
     border: none;
     padding: 14px;
-    border-radius: 16px;
+    border-radius: 12px;
     cursor: pointer;
     font-size: 1em;
-    transition: background 0.3s ease, transform 0.2s ease;
-    box-shadow: 0px 4px 10px rgba(125, 58, 193, 0.3);
+    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0px 4px 14px rgba(125, 58, 193, 0.4);
     width: 100%;
 }
 
 .btn:hover {
     background: linear-gradient(135deg, #5E0E86, #8F52E7);
-    transform: translateY(-2px);
-    box-shadow: 0px 6px 14px rgba(125, 58, 193, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0px 6px 20px rgba(125, 58, 193, 0.6);
 }
 
+.btn:active {
+    transform: translateY(1px);
+    box-shadow: 0px 2px 10px rgba(125, 58, 193, 0.3);
+}
+
+/* ----------- Animações e Feedback ----------- */
 .loading {
     color: #B350E2;
     font-size: 0.9em;
-    animation: fadeIn 1s ease-in-out infinite;
-}
-
-.tab-content {
-    display: none;
-    transition: opacity 0.3s ease-in-out;
-}
-
-.tab-content.active {
-    display: block;
-    opacity: 1;
 }
 
 .download {
@@ -154,42 +165,20 @@ p {
 }
 
 .error {
-    background: #FDDDE6;
+    background: rgba(255, 100, 100, 0.1);
     color: #A33;
     border: 1px solid #A33;
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 12px;
-    animation: fadeInDown 0.8s ease-in-out;
+    padding: 14px;
+    margin-bottom: 20px;
+    border-radius: 14px;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+.tab-content {
+    display: none;
+    transition: opacity 0.3s ease-in-out;
 }
 
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.tab-content.active {
+    display: block;
+    opacity: 1;
 }

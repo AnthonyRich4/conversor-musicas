@@ -30,16 +30,18 @@
                 <input type="text" name="youtubeURL" class="input" placeholder="Insira o link do YouTube (opcional)">
                 <p class="separator">OU</p>
                 <input type="file" name="audioFile" class="input" accept="audio/*">
-                <input type="hidden" name="effect" value="8d">
-                <button type="submit" class="btn">Converter</button>
+                <input type="hidden" name="effectType" value="8d">
+                <button type="submit" class="btn">Converter para Efeito 8D</button>
             </form>
         </div>
 
         <!-- Formulário para Efeito Slowed + Reverb -->
         <div id="slowed" class="tab-content">
-            <form class="form" action="/upload" method="POST" enctype="multipart/form-data" onsubmit="showLoadingMessage()">
-                <input type="file" name="audioFile" class="input" accept="audio/*" required>
-                <input type="hidden" name="effect" value="slowed">
+            <form class="form" action="/convert" method="POST" enctype="multipart/form-data" onsubmit="showLoadingMessage()">
+                <input type="text" name="youtubeURL" class="input" placeholder="Insira o link do YouTube (opcional)">
+                <p class="separator">OU</p>
+                <input type="file" name="audioFile" class="input" accept="audio/*">
+                <input type="hidden" name="effectType" value="slowed">
                 <button type="submit" class="btn">Converter para Slowed + Reverb</button>
             </form>
         </div>
